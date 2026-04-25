@@ -1,0 +1,15 @@
+{
+	"name": "martsalesfactory",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Enabled",
+			"editable": true
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "095479b9-883a-4a30-90f2-a4887f3a1151",
+		"tenantId": "b8a35ffb-3250-4a6a-8a60-bb4adbf9c77f"
+	}
+}

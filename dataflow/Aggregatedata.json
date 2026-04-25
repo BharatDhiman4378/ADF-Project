@@ -1,0 +1,70 @@
+{
+	"name": "Aggregatedata",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Parquet_Transformed",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "LatestData",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Item_Identifier as string,",
+				"          Item_Weight as float,",
+				"          Item_Fat_Content as string,",
+				"          Item_Visibility as double,",
+				"          Item_Type as string,",
+				"          Item_MRP as double,",
+				"          Outlet_Identifier as string,",
+				"          Outlet_Establishment_Year as short,",
+				"          Outlet_Size as string,",
+				"          Outlet_Location_Type as string,",
+				"          Outlet_Type as string,",
+				"          Item_Outlet_Sales as double,",
+				"          last_modified as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'parquet') ~> source1",
+				"filter1 aggregate(groupBy(Outlet_Size,",
+				"          Outlet_Location_Type),",
+				"     Item_Outlet_Sales = sum(Item_Outlet_Sales)) ~> aggregate1",
+				"source1 filter(!isNull(Outlet_Size)) ~> filter1",
+				"aggregate1 alterRow(upsertIf(1==1)) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

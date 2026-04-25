@@ -1,0 +1,12 @@
+{
+	"name": "integrationRuntime1",
+	"properties": {
+		"type": "SelfHosted",
+		"typeProperties": {
+			"linkedInfo": {
+				"resourceId": "/subscriptions/05bebb84-9d32-4c23-8469-4e1825ce35cf/resourcegroups/ADF_Project/providers/Microsoft.DataFactory/factories/BharatDataFactory4378/integrationruntimes/BharatintegrationRuntime",
+				"authorizationType": "Rbac"
+			}
+		}
+	}
+}

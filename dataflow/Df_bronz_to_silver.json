@@ -1,0 +1,79 @@
+{
+	"name": "Df_bronz_to_silver",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "sink_BigMartData",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Parquet_Transformed",
+						"type": "DatasetReference"
+					},
+					"name": "Transformed"
+				}
+			],
+			"transformations": [
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     lastLoadData as string (\"1900-01-01\")",
+				"}",
+				"source(output(",
+				"          Item_Identifier as string,",
+				"          Item_Weight as double,",
+				"          Item_Fat_Content as string,",
+				"          Item_Visibility as double,",
+				"          Item_Type as string,",
+				"          Item_MRP as double,",
+				"          Outlet_Identifier as string,",
+				"          Outlet_Establishment_Year as short,",
+				"          Outlet_Size as string,",
+				"          Outlet_Location_Type as string,",
+				"          Outlet_Type as string,",
+				"          Item_Outlet_Sales as double,",
+				"          last_modified as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"derivedColumn3 sort(asc(Item_MRP, true)) ~> sort1",
+				"sort1 derive(Item_MRP = round(Item_MRP, 2)) ~> derivedColumn1",
+				"derivedColumn1 derive(Item_Weight = iif(isNull(Item_Weight), toFloat(0), toFloat(Item_Weight))) ~> derivedColumn2",
+				"source1 derive(last_modified = currentUTC()) ~> derivedColumn3",
+				"derivedColumn2 alterRow(upsertIf(1==1)) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> Transformed"
+			]
+		}
+	}
+}
